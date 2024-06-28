@@ -7,6 +7,8 @@
 - Icons
 - Clean up code
 - Add config to change minimum bet and debug toggle.
+- permissions: blackjack.use, blackjack.admin for min-max bet editting on the fly.
+
 
 # BlackjackGamble
 
