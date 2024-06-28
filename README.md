@@ -1,7 +1,12 @@
-##### Need to add:
+##### Debug:
+- Fix UI not opening
+- Show debug message in console for errors and cUI drops
+
+##### To add:
 - Better cUI
 - Icons
 - Clean up code
+- Add config to change minimum bet and debug toggle.
 
 # BlackjackGamble
 
