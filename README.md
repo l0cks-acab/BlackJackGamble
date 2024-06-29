@@ -28,10 +28,6 @@ The configuration file allows you to set the minimum and maximum bet amounts. Th
 }
 ```
 
-Sure, here is a README.md for your BlackjackGamble plugin:
-
-markdown
-Copy code
 # BlackjackGamble
 
 BlackjackGamble is a Rust plugin that allows players to gamble their RP (Reward Points) in a game of Blackjack using the Economics plugin. Players can place bets and play against the dealer in a user-friendly UI.
@@ -59,9 +55,7 @@ The configuration file allows you to set the minimum and maximum bet amounts. Th
 {
   "MinBet": 10,
   "MaxBet": 1000
-}
-```
-
+}```
 ### Changing Configuration
 Open the BlackjackGamble.json file in the oxide/config directory edit the values or use the in-game commands.
 
