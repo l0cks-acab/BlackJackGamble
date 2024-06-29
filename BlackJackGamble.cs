@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins
 {
-    [Info("BlackjackGamble", "herbs.acab", "1.7.6")]
+    [Info("BlackjackGamble", "herbs.acab", "1.8.1")]
     [Description("Allows players to gamble their RP in a game of Blackjack using the Economics plugin")]
 
     public class BlackjackGamble : RustPlugin
@@ -17,6 +17,8 @@ namespace Oxide.Plugins
 
         private Dictionary<ulong, BlackjackGame> activeGames = new Dictionary<ulong, BlackjackGame>();
         private Dictionary<ulong, string> newBetInputs = new Dictionary<ulong, string>();
+
+        private static Configuration config;
 
         private class BlackjackGame
         {
@@ -63,12 +65,54 @@ namespace Oxide.Plugins
             }
         }
 
+        private class Configuration
+        {
+            public int MinBet { get; set; } = 10;
+            public int MaxBet { get; set; } = 1000;
+        }
+
+        protected override void LoadDefaultConfig()
+        {
+            config = new Configuration();
+            SaveConfig();
+        }
+
+        protected override void LoadConfig()
+        {
+            base.LoadConfig();
+            config = Config.ReadObject<Configuration>();
+            SaveConfig();
+        }
+
+        protected override void SaveConfig()
+        {
+            Config.WriteObject(config, true);
+        }
+
+        private void Init()
+        {
+            permission.RegisterPermission("blackjackgamble.use", this);
+            permission.RegisterPermission("blackjackgamble.admin", this);
+        }
+
         [ChatCommand("blackjack")]
         private void StartBlackjack(BasePlayer player, string command, string[] args)
         {
+            if (!permission.UserHasPermission(player.UserIDString, "blackjackgamble.use"))
+            {
+                player.ChatMessage("You don't have permission to use this command.");
+                return;
+            }
+
             if (args.Length != 1 || !int.TryParse(args[0], out int bet))
             {
-                player.ChatMessage("Usage: /blackjack <bet>");
+                player.ChatMessage($"Usage: /blackjack <bet> (Min: {config.MinBet}, Max: {config.MaxBet})");
+                return;
+            }
+
+            if (bet < config.MinBet || bet > config.MaxBet)
+            {
+                player.ChatMessage($"Bet amount must be between {config.MinBet} and {config.MaxBet}.");
                 return;
             }
 
@@ -88,6 +132,46 @@ namespace Oxide.Plugins
             Economics.Call("Withdraw", player.UserIDString, (double)bet);
             activeGames[player.userID] = new BlackjackGame(bet);
             ShowBlackjackUI(player);
+        }
+
+        [ChatCommand("setminbet")]
+        private void SetMinBetCommand(BasePlayer player, string command, string[] args)
+        {
+            if (!permission.UserHasPermission(player.UserIDString, "blackjackgamble.admin"))
+            {
+                player.ChatMessage("You don't have permission to use this command.");
+                return;
+            }
+
+            if (args.Length != 1 || !int.TryParse(args[0], out int minBet))
+            {
+                player.ChatMessage("Usage: /setminbet <amount>");
+                return;
+            }
+
+            config.MinBet = minBet;
+            SaveConfig();
+            player.ChatMessage($"Minimum bet set to {minBet}.");
+        }
+
+        [ChatCommand("setmaxbet")]
+        private void SetMaxBetCommand(BasePlayer player, string command, string[] args)
+        {
+            if (!permission.UserHasPermission(player.UserIDString, "blackjackgamble.admin"))
+            {
+                player.ChatMessage("You don't have permission to use this command.");
+                return;
+            }
+
+            if (args.Length != 1 || !int.TryParse(args[0], out int maxBet))
+            {
+                player.ChatMessage("Usage: /setmaxbet <amount>");
+                return;
+            }
+
+            config.MaxBet = maxBet;
+            SaveConfig();
+            player.ChatMessage($"Maximum bet set to {maxBet}.");
         }
 
         private void ShowBlackjackUI(BasePlayer player)
@@ -302,6 +386,12 @@ namespace Oxide.Plugins
             if (!int.TryParse(newBetInputs[player.userID], out int newBet) || newBet <= 0)
             {
                 player.ChatMessage("Invalid bet amount. Please enter a valid number.");
+                return;
+            }
+
+            if (newBet < config.MinBet || newBet > config.MaxBet)
+            {
+                player.ChatMessage($"Bet amount must be between {config.MinBet} and {config.MaxBet}.");
                 return;
             }
 
