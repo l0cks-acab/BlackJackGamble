@@ -1,6 +1,6 @@
 # BlackjackGamble
 
-BlackjackGamble is a Rust plugin that allows players to gamble their RP (Reward Points) in a game of Blackjack using the Economics plugin. Players can place bets and play against the dealer in a user-friendly UI.
+BlackjackGamble is a Rust plugin that allows players to gamble their RP (Reward Points) in a game of Blackjack using the Economics plugin. Players can place bets and play against the dealer in a user-friendly UI. **Dependant on: [Economics](https://umod.org/plugins/economics)**
 
 ## Features
 - Gamble RP in a game of Blackjack.
